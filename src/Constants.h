@@ -37,7 +37,10 @@
 #define JTWSTM                      20     // JTW Astronomy JTWSTM telescope mount controller Rev 2.1
 #define MANTICORE                   21     // JTW Astronomy MANTICORE telescope mount controller Rev 1.0
 
-#define PINMAP_LAST                 21
+
+#define GD32Blue                    22     // Khalid and Dave's PCB for WeAct GD32 Blue pill+ (GD32F303CC)
+
+#define PINMAP_LAST                 22
 
 // WEATHER sensors (temperature, pressure, and humidity)
 #define WEATHER_FIRST               1
