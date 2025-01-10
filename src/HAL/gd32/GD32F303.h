@@ -1,8 +1,8 @@
 // Platform setup ------------------------------------------------------------------------------------
 #pragma once
 
-// We define a more generic symbol, in case more STM32 boards based on different lines are supported
-#define __ARM_STM32__
+// We define a more generic symbol, in case more GD32 boards based on different lines are supported
+#define __ARM_GD32__
 
 #define HAL_FAST_PROCESSOR
 
@@ -35,6 +35,7 @@
 // New symbol for the default I2C port ---------------------------------------------------------------
 #include <Wire.h>
 #define HAL_WIRE Wire
+
 #ifndef HAL_WIRE_CLOCK
   #define HAL_WIRE_CLOCK 100000
 #endif

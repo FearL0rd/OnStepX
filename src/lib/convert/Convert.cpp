@@ -4,6 +4,16 @@
 #include "../../Common.h"
 #include "Convert.h"
 
+//Support to G32Community
+#if defined(GD32F30x)
+char *dtostrf (double val, signed char width, unsigned char prec, char *sout) {
+  char fmt[20];
+  sprintf(fmt, "%%%d.%df", width, prec);
+  sprintf(sout, fmt, val);
+  return sout;
+}
+#endif
+
 void strncpyex(char *result, const char *source, size_t length) {
   strncpy(result, source, length);
   result[length - 1] = 0;

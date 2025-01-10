@@ -1,39 +1,56 @@
+#include "HardwareSerial.h"
 // -------------------------------------------------------------------------------------------------
 // Pin map for OnStep on STM32
 #pragma once
 
-// This pin map is for the STM32F103CB (or C8 with 128KB)
-// and STM32F303xC "Blue Pill" boards...
-// They run at 72MHz, with 48K of RAM, and 256K of flash
+// This pin map is for the WeAct GD32F30ACC 
+// and GD32F30ACC "Blue Pill+" boards...
 //
 // More info, schematic at:
 //   http://wiki.stm32duino.com/index.php?title=Blue_Pill
 //
 // Cost on eBay and AliExpress is less than US $2.50
 
-#if defined(GD32F30X_HD) || defined(GD32F30CCT6) || defined(STM32F303xC) 
+#if defined(GD32F30x) || defined(GD32F30CCT6)
 
 // Serial ports
 // Serial1 RX1 Pin PA10, TX1 Pin PA9 (to CP2102 USB serial adapter)
 // Serial2 RX2 Pin PA3 , TX2 Pin PA2 (pins are used for other purposes)
-// Serial3 RX3 Pin PB11, TX3 Pin PB10
+// Serial3 RX3 Pin PB11, TX3 Pin PB10 (to WIFI WEMOS ADAPTER)
 
-#if SERIAL_A_BAUD_DEFAULT != OFF
-  #define SERIAL_A              Serial1
-#endif*
-#if SERIAL_B_BAUD_DEFAULT != OFF
-  #define SERIAL_B              HardSerial
-  #define SERIAL_B_RX           PB11
-  #define SERIAL_B_TX           PB10
+#if defined(GD32F30x) 
+    #if SERIAL_A_BAUD_DEFAULT != OFF
+      #define SERIAL_A              Serial1
+    #endif
+    #if SERIAL_B_BAUD_DEFAULT != OFF
+      #define SERIAL_B              Serial3
+    #endif
+    #if SERIAL_C_BAUD_DEFAULT != OFF
+      #define SERIAL_C              Serial2
+    #endif
+#else
+    //If using STM32F301C8T6 board instead G32
+    #if SERIAL_A_BAUD_DEFAULT != OFF
+      #define SERIAL_A              Serial1
+    #endif
+    #if SERIAL_B_BAUD_DEFAULT != OFF
+      #define SERIAL_B              HardSerial
+      #define SERIAL_B_RX           PB11
+      #define SERIAL_B_TX           PB10
+    #endif
 #endif
-
-
 // === Pins for DS3231 RTC/EEPROM
-// The STM32 has no built in EEPROM. Therefore, we use a DS3231 RTC module 
+// The GD32 has no built in EEPROM. Therefore, we use a DS3231 RTC module 
 // which has an EEPROM chip on the board. HAL takes care of its address and size:
 //
-// STM32 pin PB6 -> SCL on DS3231
-// STM32 pin PB7 -> SDA on DS3231
+// GD32 pin PB6 -> SCL on DS3231
+// GD32 pin PB7 -> SDA on DS3231
+
+// Specify the GD32 I2C pins
+#if defined(GD32F30x)
+	#define I2C_SCL_PIN             PB6
+	#define I2C_SDA_PIN             PB7
+#endif
 
 #if PINMAP == GD32Blue
 

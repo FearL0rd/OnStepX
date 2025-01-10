@@ -6,7 +6,7 @@
 #include "Serial_IP_Wifi_Client.h"
 
 #if OPERATIONAL_MODE == WIFI && SERIAL_CLIENT == ON
-
+    SERIAL_DEBUG.println("***************PASSOUSERIAL1");
   bool IPSerialClient::begin(long port, unsigned long clientTimeoutMs, bool persist) { 
     if (active) return true;
 

@@ -54,10 +54,15 @@
   #define MCU_STR "ESP8266"
   #include "esp/ESP8266.h"
 
-#elif defined(STM32F103xB) && defined(GD32F30CCT6) && !defined(GD32F30X_HD) 
+#elif defined(STM32F103xB) && defined(GD32F30CCT6) && !defined(GD32F30x) 
   //GD32F30CCT6 for the WeAct BluePill+ GD32F303, 256K flash, ARM Cortex M4 (STM32duino board manager) using STM Board
-  #define MCU_STR "STM32F103"
+  #define MCU_STR "GD32F303"
   #include "GD32/GD32F303.h"
+  
+#elif defined(GD32F30x) 
+  //GD32F30CCT6 for the WeAct BluePill+ GD32F303, 256K flash, ARM Cortex M4 (STM32duino board manager) using STM Board
+  #define MCU_STR "GD32F303"
+  #include "GD32/GD32F303.h"  
 
 #elif defined(STM32F103xB)
   // STM32F103C8/CB: 72MHz, 128K flash, 64K RAM, ARM Cortex M3

@@ -13,7 +13,6 @@ void SerialLocal::begin(long baud) {
   recv_tail = 0;
   recv_buffer[0] = 0;
   (void)(baud);
-
   #ifdef ESP32
     mutex = xSemaphoreCreateMutex();
   #endif

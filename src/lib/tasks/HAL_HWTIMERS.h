@@ -37,6 +37,8 @@
       defined(STM32F401xC) || defined(STM32F407xx) || \
       defined(STM32F303xC) || defined(STM32F103xB)
   #include "HAL_STM32_HWTIMER.h"
+#elif defined(GD32F30x)
+  #include "HAL_GD32_HWTIMER.h"  
 // Teensy3.0, 3.1, 3.2, 3.5, 3.6, 4.0, and 4.1
 #elif defined(_mk20dx128_h_) || defined(__MK20DX128__) || \
       defined(__MK20DX256__) || defined(__MK64FX512__) || \

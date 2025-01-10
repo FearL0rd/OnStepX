@@ -2,26 +2,49 @@
 // SerialWrapper a single class to allow uniform access to other serial port classes
 
 #include "SerialWrapper.h"
+// Add support to GD32Community
+#if defined(GD32F30x)
+    
+	#if SERIAL_A == HardSerial
+	  #undef SERIAL_A
+	  HardwareSerial HWSerialA(SERIAL_A_RX, SERIAL_A_TX,0);
+	  #define SERIAL_A HWSerialA
+	  #define SERIAL_A_RXTX_SET
+	#endif
+	#if SERIAL_B == HardSerial
+	  #undef SERIAL_B
+	  HardwareSerial HWSerialB(SERIAL_B_RX, SERIAL_B_TX,1);
+	  #define SERIAL_B HWSerialB
+	  #define SERIAL_B_RXTX_SET
+	#endif
 
-#if SERIAL_A == HardSerial
-  #undef SERIAL_A
-  HardwareSerial HWSerialA(SERIAL_A_RX, SERIAL_A_TX);
-  #define SERIAL_A HWSerialA
-  #define SERIAL_A_RXTX_SET
-#endif
+	#if SERIAL_C == HardSerial
+	  #undef SERIAL_C
+	  HardwareSerial HWSerialC(SERIAL_C_RX, SERIAL_C_TX,2);
+	  #define SERIAL_C HWSerialC
+	  #define SERIAL_C_RXTX_SET
+	#endif
+#else
+	#if SERIAL_A == HardSerial
+	  #undef SERIAL_A
+	  HardwareSerial HWSerialA(SERIAL_A_RX, SERIAL_A_TX);
+	  #define SERIAL_A HWSerialA
+	  #define SERIAL_A_RXTX_SET
+	#endif
 
-#if SERIAL_B == HardSerial
-  #undef SERIAL_B
-  HardwareSerial HWSerialB(SERIAL_B_RX, SERIAL_B_TX);
-  #define SERIAL_B HWSerialB
-  #define SERIAL_B_RXTX_SET
-#endif
+	#if SERIAL_B == HardSerial
+	  #undef SERIAL_B
+	  HardwareSerial HWSerialB(SERIAL_B_RX, SERIAL_B_TX);
+	  #define SERIAL_B HWSerialB
+	  #define SERIAL_B_RXTX_SET
+	#endif
 
-#if SERIAL_C == HardSerial
-  #undef SERIAL_C
-  HardwareSerial HWSerialC(SERIAL_C_RX, SERIAL_C_TX);
-  #define SERIAL_C HWSerialC
-  #define SERIAL_C_RXTX_SET
+	#if SERIAL_C == HardSerial
+	  #undef SERIAL_C
+	  HardwareSerial HWSerialC(SERIAL_C_RX, SERIAL_C_TX);
+	  #define SERIAL_C HWSerialC
+	  #define SERIAL_C_RXTX_SET
+	#endif
 #endif
 
 #ifdef SERIAL_BT
@@ -93,6 +116,7 @@ void SerialWrapper::begin(long baud) {
     if (isChannel(channel++))
       #if defined(SERIAL_B_RX) && defined(SERIAL_B_TX) && !defined(SERIAL_B_RXTX_SET)
         SERIAL_B.begin(baud, SERIAL_8N1, SERIAL_B_RX, SERIAL_B_TX);
+        //SERIAL_B.begin(baud, SERIAL_8N1);
       #else
         SERIAL_B.begin(baud);
       #endif
