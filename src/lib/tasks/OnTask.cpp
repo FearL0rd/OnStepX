@@ -326,7 +326,6 @@ void Task::setHardwareTimerPeriod() {
 
     period = roundPeriod((double)next_period*_task_masterFrequencyRatio);
     HAL_HWTIMER_PREPARE_PERIOD(hardware_timer, period);
-
     // if the current period is > 0.1 seconds and the new period < lastPeriod adopt the new rate immediately
     if (lastPeriod > 1600000UL && period < lastPeriod) {
       switch (hardware_timer) {

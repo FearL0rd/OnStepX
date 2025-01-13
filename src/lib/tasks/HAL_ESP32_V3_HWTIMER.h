@@ -38,6 +38,8 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
       case 4: _nextPeriod4 = counts; _nextRep4 = reps; break;
     }
     interrupts();
+
+    
   }
 #else
   void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) { (void)(num); (void)(period); }

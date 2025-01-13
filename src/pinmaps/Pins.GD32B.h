@@ -11,7 +11,7 @@
 //
 // Cost on eBay and AliExpress is less than US $2.50
 
-#if defined(GD32F30x) || defined(GD32F30CCT6)
+#if defined(GD32F30x) || defined(STM32F103xB) || defined(STM32F303xC)
 
 // Serial ports
 // Serial1 RX1 Pin PA10, TX1 Pin PA9 (to CP2102 USB serial adapter)
@@ -48,14 +48,14 @@
 
 // Specify the GD32 I2C pins
 #if defined(GD32F30x)
-	#define I2C_SCL_PIN             PB6
-	#define I2C_SDA_PIN             PB7
+	#define PIN_WIRE_SCL             PB6
+	#define PIN_WIRE_SDA             PB7
 #endif
 
 #if PINMAP == GD32Blue
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
-#define AUX0_PIN                PB2 //PC13              // Status LED
+#define AUX0_PIN                PB2              // Status LED
 #define AUX1_PIN                PB14             // ESP8266 GPIO0, SPI MISO/Fault
 #define AUX2_PIN                PA1              // ESP8266 RST, SPI MISO/Fault
 #define AUX3_PIN                PB8              // Reticle, Home SW

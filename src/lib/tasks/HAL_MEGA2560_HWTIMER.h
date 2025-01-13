@@ -43,6 +43,7 @@
     // period 0.5... us per count 32.767 ms max
     (void)priority;
     noInterrupts();
+    
     OCR1A  = 2000; // startup one millisecond
     TCCR1B = (1 << WGM12) | (1 << CS11);
     TCCR1A = 0;
