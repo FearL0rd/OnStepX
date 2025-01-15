@@ -1,6 +1,5 @@
-#include "HardwareSerial.h"
 // -------------------------------------------------------------------------------------------------
-// Pin map for OnStep on STM32
+// Pin map for OnStep on GD32
 #pragma once
 
 // This pin map is for the WeAct GD32F30ACC 
@@ -8,10 +7,16 @@
 //
 // More info, schematic at:
 //   http://wiki.stm32duino.com/index.php?title=Blue_Pill
-//
 // Cost on eBay and AliExpress is less than US $2.50
 
 #if defined(GD32F30x) || defined(STM32F103xB) || defined(STM32F303xC)
+
+#if defined(GD32F30x)
+    #define PIN_INIT() { \
+    afio_cfg_debug_ports(AFIO_DEBUG_NONE);\
+    }
+#endif
+
 
 // Serial ports
 // Serial1 RX1 Pin PA10, TX1 Pin PA9 (to CP2102 USB serial adapter)
@@ -24,9 +29,6 @@
     #endif
     #if SERIAL_B_BAUD_DEFAULT != OFF
       #define SERIAL_B              Serial3
-    #endif
-    #if SERIAL_C_BAUD_DEFAULT != OFF
-      #define SERIAL_C              Serial2
     #endif
 #else
     //If using STM32F301C8T6 board instead G32

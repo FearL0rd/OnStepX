@@ -1,10 +1,13 @@
-//--------------------------------------------------------------------------------------------------
-// Empty hardware timers
+//----------------------------------------------------------------------------------------------------
+// GD32 hardware timers
 
-// minimum structure
-                                      // a useful example for 16bit counter/timer hardware to
-#define TIMER_RATE_MHZ          4L    // allow sufficient resolution (0.25us) and range (134 seconds)
-#define TIMER_RATE_16MHZ_TICKS  4L    // timer hardware 4x slower than the default 16MHz "sub-micros" (4MHz)
+// provides four 16 bit timers with 16 bit software pre-scalers, running at 4MHz
+// each timer configured as ~0 to 0.016 seconds (granularity of timer is 0.25uS)
+// note that timer use may collide with PWM depending on which pin is being controlled
+// I tried to stay away from tone() and use the most basic timers first where possible
+
+#define TIMER_RATE_MHZ          4L    // GD32 motor timers run at 4 MHz
+#define TIMER_RATE_16MHZ_TICKS  4L    // 16L/TIMER_RATE_MHZ, 4x slower than the default 16MHz "sub micros"
 
 #if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
   // prepare hw timer for interval in sub-microseconds (1/16us)
@@ -12,12 +15,12 @@
   volatile uint16_t _nextRep1 = 0, _nextRep2 = 0, _nextRep3 = 0, _nextRep4 = 0;
   void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
     // maximum time is about 134 seconds for this design
-    uint32_t counts, reps = 0;
+    uint32_t counts, reps=0;
     if (period != 0 && period <= 2144000000) {
       if (period < 16) period = 16;   // minimum time is 1us
       period /= TIMER_RATE_16MHZ_TICKS;
-      reps    = period/65536 + 1;
-      counts  = period/reps - 1;      // has -1 since this is dropped right into a timer register
+      reps   = period/65536 + 1;
+      counts = period/reps - 1;       // has -1 since this is dropped right into a timer register
     } else counts = 4000;             // set for a 1ms period, stopped
   
     noInterrupts();
@@ -45,37 +48,41 @@
 
 #if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
 bool HAL_HWTIMER_INIT(uint8_t priority, HardwareTimer * hwtimer, void (*wrapper)()) {
-
-    (void)priority;
     hwtimer->stop();
-    hwtimer->setCaptureMode(AUX0_PIN, TIMER_CHANNEL, RISING_EDGE);
+    
+    //hwtimer->setCaptureMode(PB14, TIMER_CHANNEL, BOTH_EDGE);
+    //hwtimer->setCaptureCompare(TIMER_CHANNEL, 1); // Interrupt 1 count after each update
     hwtimer->attachInterrupt(wrapper, TIMER_CHANNEL);
-    hwtimer->setPrescaler(hwtimer->getTimerClkFre()/F_COMP); 
+    uint32_t prescaleFactor = hwtimer->getTimerClkFre()/F_COMP; // for example, 72000000/4000000 = 18
+    hwtimer->setPrescaler(prescaleFactor); 
+    hwtimer->setReloadValue(prescaleFactor); 
+    hwtimer->setCounter(0); 
     hwtimer->setPeriodTime(4000,FORMAT_MS);
-    hwtimer->refresh();
+  
+    // setInterruptPriority(priority, sub-priority)
+    (void)priority;
     hwtimer->start();
+    hwtimer->refresh();
     return true;
-
   }
 #endif
 
 #ifdef TASKS_HWTIMER1_ENABLE
   HardwareTimer *hwtimer1 = new HardwareTimer(GD32_TIMER1);
+
   void (*HAL_HWTIMER1_FUN)() = NULL; // points to task/process callback function
-  void HAL_HWTIMER1_WRAPPER(void);   // forward definition of the timer ISR
+  void HAL_HWTIMER1_WRAPPER();       // forward definition of the timer ISR
 
   bool HAL_HWTIMER1_INIT(uint8_t priority) {
-    // <--- code to init/start timer goes here
     return HAL_HWTIMER_INIT(priority, hwtimer1, HAL_HWTIMER1_WRAPPER);
   }
-  
+
   void HAL_HWTIMER1_DONE() {
-    // <--- code to stop timer goes here
     hwtimer1->stop();
     HAL_HWTIMER1_FUN = NULL;
   }
 
-  #define HAL_HWTIMER1_SET_PERIOD() (hwtimer1->setReloadValue(_nextPeriod1))// <--- code to set timer period goes here
+  #define HAL_HWTIMER1_SET_PERIOD() (hwtimer1->setReloadValue(_nextPeriod1))
   void HAL_HWTIMER1_WRAPPER() {
     TASKS_HWTIMER1_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -89,21 +96,20 @@ bool HAL_HWTIMER_INIT(uint8_t priority, HardwareTimer * hwtimer, void (*wrapper)
 
 #ifdef TASKS_HWTIMER2_ENABLE
   HardwareTimer *hwtimer2 = new HardwareTimer(GD32_TIMER2);
+
   void (*HAL_HWTIMER2_FUN)() = NULL; // points to task/process callback function
-  void HAL_HWTIMER2_WRAPPER(void);   // forward definition of the timer ISR
-  
+  void HAL_HWTIMER2_WRAPPER();       // forward definition of the timer ISR
+
   bool HAL_HWTIMER2_INIT(uint8_t priority) {
-    // <--- code to init/start timer goes here
     return HAL_HWTIMER_INIT(priority, hwtimer2, HAL_HWTIMER2_WRAPPER);
   }
 
   void HAL_HWTIMER2_DONE() {
-    // <--- code to stop timer goes here
     hwtimer2->stop();
     HAL_HWTIMER2_FUN = NULL;
   }
 
-  #define HAL_HWTIMER2_SET_PERIOD() {hwtimer2->setReloadValue(_nextPeriod2);} // <--- code to set timer period goes here
+  #define HAL_HWTIMER2_SET_PERIOD() (hwtimer2->setReloadValue(_nextPeriod2))
   void HAL_HWTIMER2_WRAPPER() {
     TASKS_HWTIMER2_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -117,21 +123,20 @@ bool HAL_HWTIMER_INIT(uint8_t priority, HardwareTimer * hwtimer, void (*wrapper)
 
 #ifdef TASKS_HWTIMER3_ENABLE
   HardwareTimer *hwtimer3 = new HardwareTimer(GD32_TIMER3);
+
   void (*HAL_HWTIMER3_FUN)() = NULL; // points to task/process callback function
-  void HAL_HWTIMER3_WRAPPER(void);   // forward definition of the timer ISR
+  void HAL_HWTIMER3_WRAPPER();       // forward definition of the timer ISR
 
   bool HAL_HWTIMER3_INIT(uint8_t priority) {
-    // <--- code to init/start timer goes here
     return HAL_HWTIMER_INIT(priority, hwtimer3, HAL_HWTIMER3_WRAPPER);
   }
-  
+
   void HAL_HWTIMER3_DONE() {
-    // <--- code to stop timer goes here
     hwtimer3->stop();
     HAL_HWTIMER3_FUN = NULL;
   }
 
-  #define HAL_HWTIMER3_SET_PERIOD() {hwtimer3->setReloadValue(_nextPeriod3);} // <--- code to set timer period goes here
+  #define HAL_HWTIMER3_SET_PERIOD() (hwtimer3->setReloadValue(_nextPeriod3))
   void HAL_HWTIMER3_WRAPPER() {
     TASKS_HWTIMER3_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -145,21 +150,20 @@ bool HAL_HWTIMER_INIT(uint8_t priority, HardwareTimer * hwtimer, void (*wrapper)
 
 #ifdef TASKS_HWTIMER4_ENABLE
   HardwareTimer *hwtimer4 = new HardwareTimer(GD32_TIMER4);
+
   void (*HAL_HWTIMER4_FUN)() = NULL; // points to task/process callback function
-  void HAL_HWTIMER4_WRAPPER(void);   // forward definition of the timer ISR
+  void HAL_HWTIMER4_WRAPPER();       // forward definition of the timer ISR
 
   bool HAL_HWTIMER4_INIT(uint8_t priority) {
-    // init code goes here
     return HAL_HWTIMER_INIT(priority, hwtimer4, HAL_HWTIMER4_WRAPPER);
   }
 
   void HAL_HWTIMER4_DONE() {
-    // <--- code to stop timer goes here
     hwtimer4->stop();
     HAL_HWTIMER4_FUN = NULL;
   }
 
-  #define HAL_HWTIMER4_SET_PERIOD() {hwtimer4->setReloadValue(_nextPeriod4);} // <--- code to set timer period goes here
+  #define HAL_HWTIMER4_SET_PERIOD() (hwtimer4->setReloadValue(_nextPeriod4))
   void HAL_HWTIMER4_WRAPPER() {
     TASKS_HWTIMER4_PROFILER_PREFIX;
     static uint16_t count = 0;

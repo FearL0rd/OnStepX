@@ -54,22 +54,27 @@
   #define MCU_STR "ESP8266"
   #include "esp/ESP8266.h"
 
-#elif defined(STM32F103xB) && !defined(GD32F30x) 
+#elif defined(STM32F103xB) && defined(GD32Blue) 
   //GD32F30CCT6 for the WeAct BluePill+ GD32F303, 256K flash, ARM Cortex M4 (STM32duino board manager) using STM Board
   #define MCU_STR "GD32F303"
   #include "GD32/GD32F303.h"
+
+#elif defined(STM32F303xC) && defined(GD32Blue) 
+  //GD32F30CCT6 for the WeAct BluePill+ GD32F303 using RobotDyn BlackPill STM32F303, 256K flash, ARM Cortex M4 (STM32duino board manager)
+  #define MCU_STR "GD32F303"
+  #include "GD32/GD32F303.h"  
   
 #elif defined(GD32F30x) 
   //GD32F30CCT6 for the WeAct BluePill+ GD32F303, 256K flash, ARM Cortex M4 (STM32duino board manager) using STM Board
   #define MCU_STR "GD32F303"
   #include "GD32/GD32F303.h"  
 
-#elif defined(STM32F103xB)
+#elif defined(STM32F103xB) && !defined(GD32Blue) 
   // STM32F103C8/CB: 72MHz, 128K flash, 64K RAM, ARM Cortex M3
   #define MCU_STR "STM32F103"
   #include "stm32/STM32F103.h"
 
-#elif defined(STM32F303xC)
+#elif defined(STM32F303xC) && !defined(GD32Blue) 
   // RobotDyn BlackPill STM32F303, 256K flash, ARM Cortex M4 (STM32duino board manager)
   #define MCU_STR "STM32F303"
   #include "stm32/STM32F303.h"

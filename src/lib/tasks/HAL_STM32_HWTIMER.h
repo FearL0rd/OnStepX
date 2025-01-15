@@ -60,12 +60,12 @@
   #define STM32_TIMER2       TIM10   // TIM9 is used for PWM reticle and the buzzer (I think)
   #define STM32_TIMER3       TIM11   // supports timers TIM1 to TIM14, TIM 1/8 are advanced, TIM2/5 are 32bit (no library support for 32 bit)
   #define STM32_TIMER4       TIM14   // the rest and general purpose or basic TIM 6/7 (this can use any type AFAIK)
-#elif defined(STM32F303xC)
+#elif defined(STM32F303xC) && !defined(GD32Blue)
   #define STM32_TIMER1       TIM17   // for STM32F303 (tone uses timer6, servo uses timer2)
   #define STM32_TIMER2       TIM16
   #define STM32_TIMER3       TIM15   // same use as prior to this point (but different order)
   #define STM32_TIMER4       TIM7
-#elif defined(STM32F103xB)
+#elif defined(STM32F103xB) || defined(GD32Blue)
   #define STM32_TIMER1       TIM4    // for STM32F103 (tone uses timer3, servo uses timer2)
   #define STM32_TIMER2       TIM2    // don't use the tone() function
   #define STM32_TIMER3       TIM1    // same use as prior to this point (but different order)
